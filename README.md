@@ -15,3 +15,5 @@ VOICEVOX可以不开
 `sport_file`为存储路径  
 运行`Vts.vtube_read(websocket, sport_file)`时开始录制  
 运行`Vts.vtube_sportout(websocket, sport_file)`时播放动作  
+录制参数仅有FaceAngleX，FaceAngleY，FaceAngleZ，EyeRightX，EyeRightY，EyeOpenLeft，EyeOpenRight  
+分别对应：头左右转向，头上下转向，头左右倾斜，眼球左右，眼球上下，左眼皮，右眼皮。  
