@@ -11,6 +11,7 @@ VOICEVOX可以不开
 
 ## 动作录制讲解
 ### 动作库不太对，需要自行重新录制
+提前打开Vtube Studio和摄像头
 打开`sport_R.py`  
 `sport_file`为存储路径  
 运行`Vts.vtube_read(websocket, sport_file)`时开始录制  
