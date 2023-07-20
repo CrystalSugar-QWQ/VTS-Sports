@@ -9,7 +9,7 @@ VOICEVOX可以不开
 运行`vtube.py`  
 输入文字体验使用  
 
-##动作录制讲解
+## 动作录制讲解
 打开`sport_R.py`  
 `sport_file`为存储路径
 运行`Vts.vtube_read(websocket, sport_file)`时开始录制  
