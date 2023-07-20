@@ -11,14 +11,13 @@ async def vtube_run():
     try:
         websocket = await websockets.connect('ws://127.0.0.1:8001')
         await Vts.init(websocket)
+        print("[VTS 初始化完成]")
     except Exception:
         print("[VTS 无法连接]")
         return
 
     await Vts.vtube_read(websocket, sport_file)
     #await Vts.vtube_sportout(websocket, sport_file)
-    while True:
-        pass
 
 
 asyncio.run(vtube_run())
