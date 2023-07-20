@@ -11,6 +11,6 @@ VOICEVOX可以不开
 
 ## 动作录制讲解
 打开`sport_R.py`  
-`sport_file`为存储路径
+`sport_file`为存储路径  
 运行`Vts.vtube_read(websocket, sport_file)`时开始录制  
 运行`Vts.vtube_sportout(websocket, sport_file)`时播放动作  
