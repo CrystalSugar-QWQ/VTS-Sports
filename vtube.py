@@ -62,6 +62,8 @@ async def vtube_run():
         return
 
     time = 0    # 超级重要的时间参数
+    pink_face_flag = False
+    black_face_flag = False
     while True:
         if action_file != "":
             if emotion_data >= 0.6:  # active状态
@@ -69,6 +71,7 @@ async def vtube_run():
                 MouthSmile_shifting = 0.6 + ((emotion_data - 0.6)/2)
                 if emotion_data >= 0.8:
                     await Vts.vtube_hotkeys(websocket, "脸红")
+                    pink_face_flag = True
             elif 0.4 < emotion_data < 0.6:    # neutral状态
                 Brows_shifting = 0.55
                 MouthSmile_shifting = 0.6
@@ -77,6 +80,7 @@ async def vtube_run():
                 MouthSmile_shifting = 0.5 - ((0.4 - emotion_data)/2)
                 if emotion_data <= 0.2:
                     await Vts.vtube_hotkeys(websocket, "脸黑")
+                    black_face_flag =True
 
             file_now = action_file
             with open(file_now, "r") as config_file:     # 读文件
@@ -94,10 +98,12 @@ async def vtube_run():
                 if file_now != action_file:
                     await Vts.parameter_values_homing(websocket, parameter_values)
                     break
-            if emotion_data >= 0.8:
+            if pink_face_flag is True:
                 await Vts.vtube_hotkeys(websocket, "脸红")
-            if emotion_data <= 0.4:
+                pink_face_flag = False
+            if black_face_flag is True:
                 await Vts.vtube_hotkeys(websocket, "脸黑")
+                black_face_flag = False
             time = 0
             if file_now == action_file:
                 special_probability = random.randint(0,100)
