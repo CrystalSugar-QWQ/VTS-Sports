@@ -1,5 +1,5 @@
 # VTS-Sports
-输入文本，根据文本输出生成l2d动作和表情  
+输入文本，根据文本输出生成l2d动作和表情,[效果视频](https://www.bilibili.com/video/BV1zu4y1U7Ae/?share_source=copy_web&vd_source=be871ab215f9686e9cf85ae02546df3f)    
 测试版本仅供参考
 
 ## 简易使用说明:  
