@@ -1,7 +1,6 @@
 import json
 import asyncio
-from png import png_base64
-import time
+from .png import png_base64
 
 PLUGIN_NAME = "Akato's sport"
 PLUGIN_DEVELOPER = "by sugar"
@@ -131,7 +130,6 @@ async def vtube_request(websocket):
     FaceAngleZ = data["data"]["defaultParameters"][5]["value"]
     EyeRightX = data["data"]["defaultParameters"][18]["value"]
     EyeRightY = data["data"]["defaultParameters"][19]["value"]
-    Brows = data["data"]["defaultParameters"][8]["value"]
     EyeOpenLeft = data["data"]["defaultParameters"][14]["value"]
     EyeOpenRight = data["data"]["defaultParameters"][15]["value"]
 
@@ -147,67 +145,76 @@ async def vtube_request(websocket):
     return parameter_values
 
 
-# 动作复位
-async def parameter_values_homing(websocket, now):
-    time = 20.000000
+# ×
+async def vtube_request_MouthOpen(websocket):
+    payload = {
+        "apiName": "VTubeStudioPublicAPI",
+        "apiVersion": API_VERSION,
+        "requestID": REQUEST_ID,
+        "messageType": "InputParameterListRequest"
+    }
 
-    FaceAngleX = now[0]["value"]
-    FaceAngleY = now[1]["value"]
-    FaceAngleZ = now[2]["value"]
-    EyeRightX = now[3]["value"]
-    EyeRightY = now[4]["value"]
-    EyeOpenLeft = now[5]["value"]
-    EyeOpenRight = now[6]["value"]
-    Brows = now[7]["value"]
-    MouthSmile = now[8]["value"]
+    await websocket.send(json.dumps(payload))
+    json_data = await websocket.recv()
+    data = json.loads(json_data)
+    # print(data["data"]["defaultParameters"][22])
 
-    FaceAngleX_add = 0 - (FaceAngleX / time)
-    FaceAngleY_add = 0 - (FaceAngleY / time)
-    FaceAngleZ_add = 0 - (FaceAngleZ / time)
-    EyeRightX_add = 0 - (EyeRightX / time)
-    EyeRightY_add = 0 - (EyeRightY / time)
+    VoiceVolume = data["data"]["defaultParameters"][22]["value"]
 
-    Brows_add = 0
-    if Brows > 0.55:
-        Brows_add = 0 - ((Brows-0.55) / time)
-    elif Brows < 0.55:
-        Brows_add = ((0.55-Brows) / time)
+    return VoiceVolume
 
-    MouthSmile_add = 0
-    if MouthSmile > 0.6:
-        MouthSmile_add = 0 - ((MouthSmile-0.6) / time)
-    elif MouthSmile < 0.6:
-        MouthSmile_add = ((0.6-MouthSmile) / time)
 
-    EyeOpenLeft_add = 0 
-    if EyeOpenLeft < 1:
-        EyeOpenLeft_add = ((1 - EyeOpenLeft) / time)
 
-    EyeOpenRight_add = 0 
-    if EyeOpenRight < 1:
-        EyeOpenRight_add = ((1 - EyeOpenRight) / time)
-    
-    for i in range(20):
-        FaceAngleX += FaceAngleX_add
-        FaceAngleY += FaceAngleY_add
-        FaceAngleZ += FaceAngleZ_add
-        EyeRightX += EyeRightX_add
-        EyeRightY += EyeRightY_add
-        Brows += Brows_add
-        MouthSmile += MouthSmile_add
-        EyeOpenLeft += EyeOpenLeft_add
-        EyeOpenRight += EyeOpenRight_add
-
-        parameter_values = [
-            {"id": "FaceAngleX", "value": FaceAngleX},
-            {"id": "FaceAngleY", "value": FaceAngleY},
-            {"id": "FaceAngleZ", "value": FaceAngleZ},
-            {"id": "EyeRightX", "value": EyeRightX},
-            {"id": "EyeRightY", "value": EyeRightY},
-            {"id": "EyeOpenLeft", "value": EyeOpenLeft},
-            {"id": "EyeOpenRight", "value": EyeOpenRight},
-            {"id": "Brows", "value": Brows},
-            {"id": "MouthSmile", "value": MouthSmile}]
-        await vtube_control(websocket, parameter_values)
-        await asyncio.sleep(0.03)
-    
+[{'name': 'FacePositionX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -15.0, 'max': 15.0, 'defaultValue': 0.0}, 
+ {'name': 'FacePositionY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -15.0, 'max': 15.0, 'defaultValue': 0.0}, 
+ {'name': 'FacePositionZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -10.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'FaceAngleX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -30.0, 'max': 30.0, 'defaultValue': 0.0}, 
+ {'name': 'FaceAngleY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -30.0, 'max': 30.0, 'defaultValue': 0.0}, 
+ {'name': 'FaceAngleZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -90.0, 'max': 90.0, 'defaultValue': 0.0}, 
+ {'name': 'MouthSmile', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'MouthOpen', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'Brows', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'TongueOut', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'CheekPuff', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'FaceAngry', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'BrowLeftY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'BrowRightY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeOpenLeft', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeOpenRight', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeLeftX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeLeftY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeRightX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'EyeRightY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'MousePositionX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'MousePositionY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'VoiceVolume', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'VoiceFrequency', 'addedBy': 'VTube Studio', 'value': 0.5, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'VoiceVolumePlusMouthOpen', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'VoiceFrequencyPlusMouthSmile', 'addedBy': 'VTube Studio', 'value': 0.5, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'MouthX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -1.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFound', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFound', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'BothHandsFound', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandDistance', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftPositionX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftPositionY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -10.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftPositionZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -10.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightPositionX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightPositionY', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -10.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightPositionZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -10.0, 'max': 10.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftAngleX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -180.0, 'max': 180.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftAngleZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -180.0, 'max': 180.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightAngleX', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -180.0, 'max': 180.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightAngleZ', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': -180.0, 'max': 180.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftOpen', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightOpen', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFinger_1_Thumb', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFinger_2_Index', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFinger_3_Middle', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFinger_4_Ring', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandLeftFinger_5_Pinky', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFinger_1_Thumb', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFinger_2_Index', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFinger_3_Middle', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFinger_4_Ring', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}, 
+ {'name': 'HandRightFinger_5_Pinky', 'addedBy': 'VTube Studio', 'value': 0.0, 'min': 0.0, 'max': 1.0, 'defaultValue': 0.0}]
