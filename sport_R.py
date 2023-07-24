@@ -36,6 +36,7 @@ async def vtube_run():
     print("1")
     print("[开始录制]")
     await Vts.vtube_read(websocket, sport_file)
+<<<<<<< HEAD
     print("[结束录制]")
     await asyncio.sleep(1)
     print("3")
@@ -48,6 +49,9 @@ async def vtube_run():
     print("[播放结束]")
 
     # 摆烂CV式写法，开摆~
+=======
+    #await Vts.vtube_sportout(websocket, sport_file)
+>>>>>>> f8fc7f0a7f1c194a0c99b8eadf5c87d072413986
 
 
 asyncio.run(vtube_run())

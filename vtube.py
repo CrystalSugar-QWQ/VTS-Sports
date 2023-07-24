@@ -1,5 +1,6 @@
 import asyncio, websockets
 from snownlp import SnowNLP
+import sympy as sp
 import threading, queue, multiprocessing
 import Vts
 import VoiceVox
@@ -9,7 +10,35 @@ import time
 
 # 全局变量
 emotion_data = 0
+<<<<<<< HEAD
 is_speak = 0
+=======
+# 创建锁
+lock = threading.Lock()
+
+# 正弦波函数，负责待机时动作,amplitude 振幅,frequency 频率,phase_shift 相位差,shifting 初始偏移
+def waiting_sport(time, amplitude = 2, frequency = 0.6, shifting = 0):
+    # 定义符号变量
+    x = sp.symbols('x')
+
+    # 计算正弦波函数的表达式，振幅为amplitude，频率为1 Hz
+    sin_expr = amplitude * sp.sin(2 * sp.pi * frequency * x) + shifting
+
+    # 计算正弦波函数的值，并将结果精确到8位小数
+    value = sin_expr.subs(x, time).evalf(8)
+
+    return float(value)
+
+# 头，眼，眉，以及微笑
+async def waiting_model(time):
+    FaceAngleZ = waiting_sport(time,amplitude=2.5)
+    FaceAngleY = waiting_sport(time,amplitude=1)
+    FaceAngleX = waiting_sport(time,amplitude=1.5, frequency = 0.25)
+    Brows = waiting_sport(time,amplitude=0.025, frequency = 0.5, shifting=0.55)
+    EyeOpenLeft = EyeOpenRight = waiting_sport(time, amplitude=10, frequency = 0.5, shifting = 10)
+    EyeRightX = waiting_sport(time, amplitude=0.1, frequency = 0.5)
+    MouthSmile = waiting_sport(time, amplitude=0.08, frequency = 0.5, shifting=0.6)
+>>>>>>> f8fc7f0a7f1c194a0c99b8eadf5c87d072413986
 
 
 # 情绪处理，输出表情偏移量、表情动画
@@ -59,6 +88,7 @@ async def vtube_run():
         print("[VTS 无法连接]")
         return
 
+<<<<<<< HEAD
     while True:
         if is_speak == 1:
             Brows_shifting, MouthSmile_shifting, expression, emotion_file= await emotion_sport(websocket)
@@ -90,6 +120,59 @@ async def vtube_run():
                     MouthSmile = Vts.sine_wave(time, amplitude=0.08, shifting=MouthSmile_shifting)
                     parameter_values = data[i]
                     parameter_values.append({"id": "Brows", "value": Brows})
+=======
+    time = 0    # 超级重要的时间参数
+    pink_face_flag = False
+    black_face_flag = False
+    while True:
+        if action_file != "":
+            if emotion_data >= 0.6:  # active状态
+                Brows_shifting = 0.55 + ((emotion_data - 0.6)/4)
+                MouthSmile_shifting = 0.6 + ((emotion_data - 0.6)/2)
+                if emotion_data >= 0.8:
+                    await Vts.vtube_hotkeys(websocket, "脸红")
+                    pink_face_flag = True
+            elif 0.4 < emotion_data < 0.6:    # neutral状态
+                Brows_shifting = 0.55
+                MouthSmile_shifting = 0.6
+            elif emotion_data <= 0.4:    # negative状态
+                Brows_shifting = 0.5 - ((0.4 - emotion_data)/4)
+                MouthSmile_shifting = 0.5 - ((0.4 - emotion_data)/2)
+                if emotion_data <= 0.2:
+                    await Vts.vtube_hotkeys(websocket, "脸黑")
+                    black_face_flag =True
+
+            file_now = action_file
+            with open(file_now, "r") as config_file:     # 读文件
+                data = json.load(config_file)
+            time = 0
+            for i in range(len(data)):
+                Brows = waiting_sport(time,amplitude=0.025, frequency = 0.5, shifting=Brows_shifting)
+                MouthSmile = waiting_sport(time, amplitude=0.08, frequency = 0.5, shifting=MouthSmile_shifting)
+                parameter_values = data[i]
+                parameter_values.append({"id": "Brows", "value": Brows})
+                parameter_values.append({"id": "MouthSmile", "value": MouthSmile})
+                await Vts.vtube_control(websocket, parameter_values)
+                await asyncio.sleep(0.02)
+                time += 0.02
+                if file_now != action_file:
+                    await Vts.parameter_values_homing(websocket, parameter_values)
+                    break
+            if pink_face_flag is True:
+                await Vts.vtube_hotkeys(websocket, "脸红")
+                pink_face_flag = False
+            if black_face_flag is True:
+                await Vts.vtube_hotkeys(websocket, "脸黑")
+                black_face_flag = False
+            time = 0
+            if file_now == action_file:
+                special_probability = random.randint(0,100)
+                if special_probability <= 60 and emotion_data >= 0.4:     # 随机触发wink
+                    wink_sport = random.randint(2,2)
+                    file_now = f"./sport/special/wink{wink_sport}.json"
+                    await Vts.parameter_values_homing(websocket, parameter_values)
+                    parameter_values = await Vts.vtube_sportout(websocket, file_now)     # 不准打断,谁打断wink我跟谁急
+>>>>>>> f8fc7f0a7f1c194a0c99b8eadf5c87d072413986
                     parameter_values.append({"id": "MouthSmile", "value": MouthSmile})
                     await Vts.vtube_control(websocket, parameter_values)
                     await asyncio.sleep(0.02)
